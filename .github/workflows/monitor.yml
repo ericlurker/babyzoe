@@ -1,39 +1,26 @@
 name: monitor
 
-
 on:
-  push:
-    branches: ['master']
-  pull_request:
-    branches: ['*']
+  schedule:
+    - cron: '*/10 * * * *'
 
 jobs:
   tesnet_bridger_roller_monitor:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - name: check goerli
+      - uses: actions/checkout@v2
+      - name: monitor commitments
         run: |
-          Commitments = `curl -X 'GET' \
-          'https://indexer.auditablezk.mystiko.network/chains/5/commitments?where=%20%20%20%20%7B%0A%20%20%20%20%22status%22%3A%20%7B%22neq%22%3A%22succeeded%22%7D%0A%20%20%20%20%7D' \
-          -H 'accept: application/json'`
-          if [ ${{ fromJSON($Commitments.code) }} != "200" ]
-          then
-            echo 'get commitments from indexer meet error'
-            exit 1
-          fi
+          chmod +x ./scripts/monitor.sh
+          ./scripts/monitor.sh
+        shell: bash
 
-          if [ ${{ fromJSON($Commitments.result) }} != "[]" ]
-          then
-            echo 'commitment not bridge or rollup'
-            exit 1
-          fi
-
-#      - name: Telegram Failure Notification
-#        uses: appleboy/telegram-action@master
-#        if: failure()
-#        with:
-#          message: ❗ Waring commitments status check error, should check bridge or roller
-#          format: markdown
-#          to: ${{ secrets.TELEGRAM_CHAT_ID }}
-#          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      # - name: Telegram Failure Notification
+      #   uses: appleboy/telegram-action@master
+      #   if: failure()
+      #   with:
+      #     message: ❗ Waring commitments status check error, should check bridge or roller
+      #     format: markdown
+      #     to: ${{ secrets.TELEGRAM_CHAT_ID }}
+      #     token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
