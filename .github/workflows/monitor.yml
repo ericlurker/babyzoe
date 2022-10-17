@@ -1,8 +1,11 @@
 name: monitor
 
+
 on:
-  schedule:
-    - cron: '5,10 * * * *'
+  push:
+    branches: ['master']
+  pull_request:
+    branches: ['*']
 
 jobs:
   tesnet_bridger_roller_monitor:
