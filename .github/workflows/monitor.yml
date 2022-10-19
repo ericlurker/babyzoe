@@ -2,7 +2,7 @@ name: monitor
 
 on:
   push:
-    branches: [ main ]
+    branches: ['*']
 
 jobs:
   container-test-job:
