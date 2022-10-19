@@ -1,26 +1,22 @@
 name: monitor
 
 on:
-  schedule:
-    - cron: '*/10 * * * *'
+  push:
+    branches: [ main ]
 
 jobs:
-  tesnet_bridger_roller_monitor:
-    runs-on: ubuntu-20.04
+  container-test-job:
+    runs-on: ubuntu-latest
+    container:
+      image: node:14.16
+      env:
+        NODE_ENV: development
+      ports:
+        - 80
+      volumes:
+        - my_docker_volume:/volume_mount
+      options: --cpus 1
     steps:
-      - uses: actions/checkout@v2
-      - name: monitor commitments
-        run: |
-          chmod +x ./scripts/monitor.sh
-          ./scripts/monitor.sh
-        shell: bash
-
-      # - name: Telegram Failure Notification
-      #   uses: appleboy/telegram-action@master
-      #   if: failure()
-      #   with:
-      #     message: ❗ Waring commitments status check error, should check bridge or roller
-      #     format: markdown
-      #     to: ${{ secrets.TELEGRAM_CHAT_ID }}
-      #     token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      - name: Check for dockerenv file
+        run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
 
